@@ -1,3 +1,7 @@
+/**
+ * 音频分析器
+ * 负责捕获麦克风输入、分析音频特征（音量、频率、频谱等）
+ */
 class AudioAnalyzer {
     constructor() {
         this.audioContext = null;
@@ -43,6 +47,10 @@ class AudioAnalyzer {
         this.onFrequencyChange = null;
     }
     
+    /**
+     * 初始化音频系统
+     * @returns {Promise<boolean>} 初始化是否成功
+     */
     async init() {
         try {
             this.stream = await navigator.mediaDevices.getUserMedia({ 
@@ -80,6 +88,10 @@ class AudioAnalyzer {
         }
     }
     
+    /**
+     * 自动校准环境噪声
+     * @returns {Promise<void>}
+     */
     async calibrate() {
         return new Promise((resolve) => {
             const samples = [];
@@ -118,6 +130,9 @@ class AudioAnalyzer {
         });
     }
     
+    /**
+     * 停止音频采集
+     */
     stop() {
         if (this.stream) {
             this.stream.getTracks().forEach(track => track.stop());
@@ -129,6 +144,9 @@ class AudioAnalyzer {
         this.isInitialized = false;
     }
     
+    /**
+     * 执行音频分析（每帧调用）
+     */
     analyze() {
         if (!this.isInitialized || !this.analyser) return;
         
@@ -144,6 +162,9 @@ class AudioAnalyzer {
         this.updateHistory();
     }
     
+    /**
+     * 计算音量（RMS）
+     */
     calculateVolume() {
         let sum = 0;
         let max = 0;
@@ -158,7 +179,6 @@ class AudioAnalyzer {
         let normalizedVolume = rms / 255;
         
         normalizedVolume *= this.manualGain;
-        
         normalizedVolume += this.manualCalibrationOffset;
         
         if (this.isCalibrated && normalizedVolume > this.ambientNoiseLevel) {
@@ -175,6 +195,9 @@ class AudioAnalyzer {
         }
     }
     
+    /**
+     * 计算主频率
+     */
     calculateFrequency() {
         let maxIndex = 0;
         let maxValue = 0;
@@ -195,6 +218,9 @@ class AudioAnalyzer {
         }
     }
     
+    /**
+     * 计算频段能量分布
+     */
     calculateFrequencyBands() {
         const bufferLength = this.dataArray.length;
         const nyquist = this.audioContext.sampleRate / 2;
@@ -229,6 +255,9 @@ class AudioAnalyzer {
         }
     }
     
+    /**
+     * 计算频谱特征（质心和平坦度）
+     */
     calculateSpectralFeatures() {
         let weightedSum = 0;
         let totalEnergy = 0;
@@ -260,6 +289,9 @@ class AudioAnalyzer {
         }
     }
     
+    /**
+     * 计算过零率
+     */
     calculateZeroCrossingRate() {
         let crossings = 0;
         const threshold = 128;
@@ -274,6 +306,9 @@ class AudioAnalyzer {
         this.zeroCrossingRate = crossings / this.timeDataArray.length;
     }
     
+    /**
+     * 更新历史数据
+     */
     updateHistory() {
         this.volumeHistory.push(this.smoothedVolume);
         if (this.volumeHistory.length > this.historyLength) {
@@ -286,26 +321,50 @@ class AudioAnalyzer {
         }
     }
     
+    /**
+     * 获取平滑音量
+     * @returns {number} 音量值 (0-1)
+     */
     getVolume() {
         return this.smoothedVolume;
     }
     
+    /**
+     * 获取主频率
+     * @returns {number} 频率值 (Hz)
+     */
     getFrequency() {
         return this.smoothedFrequency;
     }
     
+    /**
+     * 获取频段数据
+     * @returns {Object} 频段能量对象
+     */
     getFrequencyBands() {
         return this.frequencyBands;
     }
     
+    /**
+     * 获取原始频率数据
+     * @returns {Uint8Array} 频率数据数组
+     */
     getFrequencyData() {
         return this.dataArray;
     }
     
+    /**
+     * 获取时域数据
+     * @returns {Uint8Array} 时域数据数组
+     */
     getTimeData() {
         return this.timeDataArray;
     }
     
+    /**
+     * 获取音量（分贝）
+     * @returns {number} 分贝值 (-60 to 0)
+     */
     getVolumeInDb() {
         if (this.smoothedVolume < 0.001) {
             return -60;
@@ -315,10 +374,18 @@ class AudioAnalyzer {
         return Math.round(Utils.clamp(db, -60, 0));
     }
     
+    /**
+     * 获取主频率（Hz）
+     * @returns {number} 频率值
+     */
     getDominantFrequencyHz() {
         return Math.round(this.smoothedFrequency);
     }
     
+    /**
+     * 获取音量趋势
+     * @returns {string} 'rising' | 'falling' | 'stable'
+     */
     getVolumeTrend() {
         if (this.volumeHistory.length < 10) return 'stable';
         
@@ -335,6 +402,10 @@ class AudioAnalyzer {
         return 'stable';
     }
     
+    /**
+     * 获取能量分布比例
+     * @returns {Object} 各频段能量比例
+     */
     getEnergyDistribution() {
         const { bass, lowMid, mid, highMid, treble } = this.frequencyBands;
         const total = bass + lowMid + mid + highMid + treble;
@@ -352,6 +423,10 @@ class AudioAnalyzer {
         };
     }
     
+    /**
+     * 设置手动增益
+     * @param {number} gain - 增益值 (0.1-10)
+     */
     setManualGain(gain) {
         this.manualGain = Math.max(0.1, Math.min(10, gain));
         if (this.gainNode) {
@@ -359,10 +434,18 @@ class AudioAnalyzer {
         }
     }
     
+    /**
+     * 设置手动校准偏移
+     * @param {number} offset - 偏移值 (-0.5 to 0.5)
+     */
     setManualCalibrationOffset(offset) {
         this.manualCalibrationOffset = Math.max(-0.5, Math.min(0.5, offset));
     }
     
+    /**
+     * 校准到当前噪声水平
+     * @returns {number} 当前噪声水平
+     */
     calibrateToCurrentLevel() {
         if (!this.isInitialized || !this.analyser) return;
         
@@ -387,6 +470,9 @@ class AudioAnalyzer {
         return this.ambientNoiseLevel;
     }
     
+    /**
+     * 重置校准
+     */
     resetCalibration() {
         this.ambientNoiseLevel = 0;
         this.calibrationFactor = 1.0;

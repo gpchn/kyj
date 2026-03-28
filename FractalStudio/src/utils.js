@@ -1,16 +1,52 @@
+/**
+ * 工具函数库
+ * 提供数学计算、颜色转换等通用功能
+ */
 const Utils = {
+    /**
+     * 数值约束
+     * @param {number} value - 输入值
+     * @param {number} min - 最小值
+     * @param {number} max - 最大值
+     * @returns {number} 约束后的值
+     */
     clamp(value, min, max) {
         return Math.min(Math.max(value, min), max);
     },
     
+    /**
+     * 线性插值
+     * @param {number} a - 起始值
+     * @param {number} b - 结束值
+     * @param {number} t - 插值因子 (0-1)
+     * @returns {number} 插值结果
+     */
     lerp(a, b, t) {
         return a + (b - a) * t;
     },
     
+    /**
+     * 值域映射
+     * @param {number} value - 输入值
+     * @param {number} inMin - 输入最小值
+     * @param {number} inMax - 输入最大值
+     * @param {number} outMin - 输出最小值
+     * @param {number} outMax - 输出最大值
+     * @returns {number} 映射后的值
+     */
     mapRange(value, inMin, inMax, outMin, outMax) {
-        return outMin + (outMax - outMin) * ((value - inMin) / (inMax - inMin));
+        const divisor = inMax - inMin;
+        if (divisor === 0) return outMin;
+        return outMin + (outMax - outMin) * ((value - inMin) / divisor);
     },
     
+    /**
+     * HSL转RGB颜色
+     * @param {number} h - 色相 (0-1)
+     * @param {number} s - 饱和度 (0-1)
+     * @param {number} l - 亮度 (0-1)
+     * @returns {{r: number, g: number, b: number}} RGB颜色对象
+     */
     hslToRgb(h, s, l) {
         let r, g, b;
         
@@ -40,6 +76,13 @@ const Utils = {
         };
     },
     
+    /**
+     * 平滑着色算法
+     * 用于分形渲染中产生平滑的颜色过渡
+     * @param {number} t - 迭代次数
+     * @param {number} iterations - 最终迭代值的模方
+     * @returns {number} 平滑后的迭代值
+     */
     smoothColor(t, iterations) {
         const absIter = Math.max(1, Math.abs(iterations));
         const logValue = Math.log(absIter);
