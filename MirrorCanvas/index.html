@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>镜像画板 | Mirror Canvas</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: #fafafa;
+            min-height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+        
+        .sidebar {
+            width: 280px;
+            background: #fff;
+            border-right: 1px solid #eee;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+        
+        .logo {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1a1a1a;
+            text-align: center;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .section {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .section-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #999;
+            font-weight: 500;
+        }
+        
+        .symmetry-modes {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+        
+        .mode-btn {
+            padding: 12px 8px;
+            background: #f5f5f5;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 12px;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .mode-btn:hover {
+            background: #eee;
+        }
+        
+        .mode-btn.active {
+            background: #fff;
+            border-color: #1a1a1a;
+            color: #1a1a1a;
+        }
+        
+        .fun-modes {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .fun-btn {
+            flex: 1;
+            padding: 10px 8px;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border: 2px solid transparent;
+            border-radius: 8px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 11px;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .fun-btn:hover {
+            background: linear-gradient(135deg, #fff, #f8f9fa);
+            transform: translateY(-2px);
+        }
+        
+        .fun-btn.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-color: transparent;
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .fun-icon {
+            font-size: 18px;
+        }
+        
+        .mode-icon {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .mode-icon svg {
+            width: 24px;
+            height: 24px;
+        }
+        
+        .param-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .param-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            color: #666;
+        }
+        
+        .param-value {
+            color: #1a1a1a;
+            font-weight: 500;
+        }
+        
+        .param-slider {
+            width: 100%;
+            height: 4px;
+            -webkit-appearance: none;
+            background: #eee;
+            border-radius: 2px;
+            outline: none;
+        }
+        
+        .param-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            background: #1a1a1a;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        
+        .color-palette {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .color-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 3px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .color-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        .color-btn.active {
+            border-color: #1a1a1a;
+        }
+        
+        .custom-color {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            overflow: hidden;
+        }
+        
+        .custom-color::-webkit-color-swatch-wrapper {
+            padding: 0;
+        }
+        
+        .custom-color::-webkit-color-swatch {
+            border: none;
+            border-radius: 50%;
+        }
+        
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: auto;
+        }
+        
+        .action-btn {
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .action-btn.primary {
+            background: #1a1a1a;
+            color: #fff;
+        }
+        
+        .action-btn.primary:hover {
+            background: #333;
+        }
+        
+        .action-btn.secondary {
+            background: #f5f5f5;
+            color: #666;
+        }
+        
+        .action-btn.secondary:hover {
+            background: #eee;
+        }
+        
+        .canvas-area {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f0f0f0;
+            position: relative;
+        }
+        
+        #canvas {
+            background: #fff;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            cursor: crosshair;
+        }
+        
+        .mirror-line {
+            position: absolute;
+            pointer-events: none;
+            z-index: 10;
+        }
+        
+        .mirror-line.vertical {
+            width: 1px;
+            height: 100%;
+            background: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.1), transparent);
+            left: 50%;
+            top: 0;
+        }
+        
+        .mirror-line.horizontal {
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(to right, transparent, rgba(0, 0, 0, 0.1), transparent);
+            top: 50%;
+            left: 0;
+        }
+        
+        .brush-preview {
+            position: fixed;
+            pointer-events: none;
+            border-radius: 50%;
+            border: 1px solid rgba(0, 0, 0, 0.3);
+            transform: translate(-50%, -50%);
+            z-index: 100;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo">镜像画板</div>
+        
+        <div class="section">
+            <div class="section-title">对称模式</div>
+            <div class="symmetry-modes">
+                <button class="mode-btn active" data-mode="vertical">
+                    <div class="mode-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="2" x2="12" y2="22"/>
+                        </svg>
+                    </div>
+                    <span>垂直</span>
+                </button>
+                <button class="mode-btn" data-mode="horizontal">
+                    <div class="mode-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="2" y1="12" x2="22" y2="12"/>
+                        </svg>
+                    </div>
+                    <span>水平</span>
+                </button>
+                <button class="mode-btn" data-mode="quad">
+                    <div class="mode-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="2" x2="12" y2="22"/>
+                            <line x1="2" y1="12" x2="22" y2="12"/>
+                        </svg>
+                    </div>
+                    <span>四向</span>
+                </button>
+                <button class="mode-btn" data-mode="radial">
+                    <div class="mode-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="8"/>
+                            <line x1="12" y1="4" x2="12" y2="20"/>
+                            <line x1="4" y1="12" x2="20" y2="12"/>
+                        </svg>
+                    </div>
+                    <span>径向</span>
+                </button>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">趣味模式</div>
+            <div class="fun-modes">
+                <button class="fun-btn" data-mode="rainbow" title="彩虹画笔">
+                    <span class="fun-icon">🌈</span>
+                    <span>彩虹</span>
+                </button>
+                <button class="fun-btn" data-mode="neon" title="霓虹发光">
+                    <span class="fun-icon">💡</span>
+                    <span>霓虹</span>
+                </button>
+                <button class="fun-btn" data-mode="particle" title="粒子效果">
+                    <span class="fun-icon">💫</span>
+                    <span>粒子</span>
+                </button>
+            </div>
+        </div>
+        
+        <div class="section" id="radial-section" style="display: none;">
+            <div class="section-title">径向设置</div>
+            <div class="param-group">
+                <div class="param-label">
+                    <span>对称段数</span>
+                    <span class="param-value" id="segments-value">8</span>
+                </div>
+                <input type="range" class="param-slider" id="radial-segments" min="3" max="24" value="8">
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">画笔设置</div>
+            <div class="param-group">
+                <div class="param-label">
+                    <span>大小</span>
+                    <span class="param-value" id="size-value">8px</span>
+                </div>
+                <input type="range" class="param-slider" id="brush-size" min="1" max="50" value="8">
+            </div>
+            <div class="param-group">
+                <div class="param-label">
+                    <span>透明度</span>
+                    <span class="param-value" id="opacity-value">100%</span>
+                </div>
+                <input type="range" class="param-slider" id="brush-opacity" min="10" max="100" value="100">
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">颜色</div>
+            <div class="color-palette" id="color-palette">
+                <div class="color-btn active" data-color="#1a1a1a" style="background: #1a1a1a;"></div>
+                <div class="color-btn" data-color="#e74c3c" style="background: #e74c3c;"></div>
+                <div class="color-btn" data-color="#e67e22" style="background: #e67e22;"></div>
+                <div class="color-btn" data-color="#f1c40f" style="background: #f1c40f;"></div>
+                <div class="color-btn" data-color="#2ecc71" style="background: #2ecc71;"></div>
+                <div class="color-btn" data-color="#3498db" style="background: #3498db;"></div>
+                <div class="color-btn" data-color="#9b59b6" style="background: #9b59b6;"></div>
+                <input type="color" class="custom-color" id="custom-color" value="#1a1a1a" title="自定义颜色">
+            </div>
+        </div>
+        
+        <div class="action-buttons">
+            <button class="action-btn secondary" id="clear-btn">清空画布</button>
+            <button class="action-btn primary" id="save-btn">保存图片</button>
+        </div>
+    </div>
+    
+    <div class="canvas-area">
+        <canvas id="canvas" width="800" height="600"></canvas>
+        <div class="mirror-line vertical" id="mirror-line"></div>
+        <div class="brush-preview" id="brush-preview"></div>
+    </div>
+    
+    <script src="src/app.js"></script>
+</body>
+</html>

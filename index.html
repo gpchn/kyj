@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="创意艺术集合 - 五款独特的艺术创作工具">
+    <meta name="keywords" content="艺术,创意,水墨,分形,色差,镜像,情绪">
+    <meta name="author" content="KYJ Studio">
+    <meta name="theme-color" content="#1a1a2e">
+    <title>创意艺术集合 | KYJ Studio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-card: #1a1a2e;
+            --text-primary: #f5f5f0;
+            --text-secondary: rgba(255, 255, 255, 0.7);
+            --text-muted: rgba(255, 255, 255, 0.5);
+            --accent-ink: #2d2d2d;
+            --accent-spectrum: linear-gradient(135deg, #ff6b9d, #c44569, #4ecdc4);
+            --accent-fractal: linear-gradient(135deg, #667eea, #764ba2, #f093fb);
+            --accent-color: linear-gradient(135deg, #4ecdc4, #44a08d, #93f9b9);
+            --accent-mirror: linear-gradient(135deg, #ffecd2, #fcb69f, #ff9a9e);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --shadow-soft: 0 4px 30px rgba(0, 0, 0, 0.3);
+            --shadow-glow: 0 0 40px rgba(100, 100, 255, 0.1);
+            --radius-sm: 8px;
+            --radius-md: 16px;
+            --radius-lg: 24px;
+            --transition-fast: 0.2s ease;
+            --transition-normal: 0.3s ease;
+            --transition-slow: 0.5s ease;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .bg-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.3;
+            animation: float 20s ease-in-out infinite;
+        }
+
+        .bg-orb:nth-child(1) {
+            width: 600px;
+            height: 600px;
+            background: #667eea;
+            top: -200px;
+            left: -200px;
+            animation-delay: 0s;
+        }
+
+        .bg-orb:nth-child(2) {
+            width: 500px;
+            height: 500px;
+            background: #764ba2;
+            bottom: -150px;
+            right: -150px;
+            animation-delay: -5s;
+        }
+
+        .bg-orb:nth-child(3) {
+            width: 400px;
+            height: 400px;
+            background: #4ecdc4;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation-delay: -10s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(50px, -50px) scale(1.1); }
+            50% { transform: translate(-30px, 30px) scale(0.95); }
+            75% { transform: translate(30px, 50px) scale(1.05); }
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 clamp(16px, 5vw, 40px);
+        }
+
+        header {
+            padding: clamp(40px, 8vh, 80px) 0;
+            text-align: center;
+        }
+
+        .logo {
+            font-family: 'Noto Serif SC', serif;
+            font-size: clamp(2.5rem, 8vw, 4.5rem);
+            font-weight: 700;
+            background: linear-gradient(135deg, #fff 0%, #c8c8c8 50%, #fff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: clamp(16px, 3vw, 24px);
+            letter-spacing: 0.1em;
+        }
+
+        .subtitle {
+            font-size: clamp(1rem, 3vw, 1.25rem);
+            color: var(--text-secondary);
+            font-weight: 300;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+        }
+
+        .divider {
+            width: 120px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--text-muted), transparent);
+            margin: clamp(30px, 5vh, 50px) auto;
+        }
+
+        .intro {
+            max-width: 700px;
+            margin: 0 auto clamp(40px, 8vh, 80px);
+            text-align: center;
+        }
+
+        .intro p {
+            font-size: clamp(1rem, 2.5vw, 1.125rem);
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 350px), 1fr));
+            gap: clamp(20px, 4vw, 32px);
+            padding-bottom: clamp(60px, 10vh, 100px);
+        }
+
+        .project-card {
+            position: relative;
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            transition: all var(--transition-normal);
+            cursor: pointer;
+            text-decoration: none;
+            display: block;
+        }
+
+        .project-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .project-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            opacity: 0;
+            transition: opacity var(--transition-normal);
+        }
+
+        .project-card:hover::before {
+            opacity: 1;
+        }
+
+        .project-card.ink::before { background: linear-gradient(90deg, #1a1a1a, #4a4a4a); }
+        .project-card.spectrum::before { background: var(--accent-spectrum); }
+        .project-card.fractal::before { background: var(--accent-fractal); }
+        .project-card.color::before { background: var(--accent-color); }
+        .project-card.mirror::before { background: var(--accent-mirror); }
+
+        .card-preview {
+            position: relative;
+            height: 200px;
+            overflow: hidden;
+        }
+
+        .card-preview canvas {
+            width: 100%;
+            height: 100%;
+        }
+
+        .card-preview .preview-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+        }
+
+        .project-card.ink .preview-bg {
+            background: linear-gradient(135deg, #f5f3ef 0%, #e8e0d0 100%);
+            color: #1a1a1a;
+        }
+
+        .project-card.spectrum .preview-bg {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        }
+
+        .project-card.fractal .preview-bg {
+            background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 100%);
+        }
+
+        .project-card.color .preview-bg {
+            background: linear-gradient(135deg, #2d3436 0%, #1a1a2e 100%);
+        }
+
+        .project-card.mirror .preview-bg {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            color: #1a1a1a;
+        }
+
+        .card-content {
+            padding: clamp(20px, 4vw, 28px);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .card-title {
+            font-family: 'Noto Serif SC', serif;
+            font-size: clamp(1.25rem, 3vw, 1.5rem);
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .card-arrow {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--transition-fast);
+        }
+
+        .project-card:hover .card-arrow {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateX(4px);
+        }
+
+        .card-arrow svg {
+            width: 16px;
+            height: 16px;
+            stroke: var(--text-secondary);
+        }
+
+        .card-description {
+            font-size: clamp(0.875rem, 2vw, 1rem);
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+
+        .card-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .tag {
+            padding: 4px 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        footer {
+            text-align: center;
+            padding: clamp(30px, 5vh, 50px) 0;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .footer-text {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-top: 16px;
+        }
+
+        .footer-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: color var(--transition-fast);
+        }
+
+        .footer-links a:hover {
+            color: var(--text-primary);
+        }
+
+        @media (max-width: 768px) {
+            .projects-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .card-preview {
+                height: 160px;
+            }
+
+            .subtitle {
+                letter-spacing: 0.15em;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeIn 0.6s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .project-card:nth-child(1) { animation-delay: 0.1s; }
+        .project-card:nth-child(2) { animation-delay: 0.2s; }
+        .project-card:nth-child(3) { animation-delay: 0.3s; }
+        .project-card:nth-child(4) { animation-delay: 0.4s; }
+        .project-card:nth-child(5) { animation-delay: 0.5s; }
+    </style>
+</head>
+<body>
+    <div class="bg-animation">
+        <div class="bg-orb"></div>
+        <div class="bg-orb"></div>
+        <div class="bg-orb"></div>
+    </div>
+
+    <div class="container">
+        <header>
+            <h1 class="logo">创意艺术集合</h1>
+            <p class="subtitle">Creative Art Collection</p>
+        </header>
+
+        <div class="divider"></div>
+
+        <div class="intro">
+            <p>探索五款独特的数字艺术创作工具，从传统水墨到现代分形，从声音可视化到色彩挑战，开启您的创意之旅。</p>
+        </div>
+
+        <div class="projects-grid">
+            <a href="InkSeasons/index.html" class="project-card ink fade-in">
+                <div class="card-preview">
+                    <div class="preview-bg">墨</div>
+                </div>
+                <div class="card-content">
+                    <div class="card-header">
+                        <h2 class="card-title">墨韵四季</h2>
+                        <div class="card-arrow">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M5 12h14M12 5l7 7-7 7"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <p class="card-description">沉浸式水墨画创作体验，感受四季变换中的东方美学，体验真实的水墨晕染效果。</p>
+                    <div class="card-tags">
+                        <span class="tag">水墨画</span>
+                        <span class="tag">四季主题</span>
+                        <span class="tag">真实笔触</span>
+                    </div>
+                </div>
+            </a>
+
+            <a href="EmotionSpectrum/index.html" class="project-card spectrum fade-in">
+                <div class="card-preview">
+                    <div class="preview-bg">🎵</div>
+                </div>
+                <div class="card-content">
+                    <div class="card-header">
+                        <h2 class="card-title">情绪光谱</h2>
+                        <div class="card-arrow">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M5 12h14M12 5l7 7-7 7"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <p class="card-description">将声音转化为绚丽的视觉艺术，四种可视化模式展现声音的情绪与能量。</p>
+                    <div class="card-tags">
+                        <span class="tag">声音可视化</span>
+                        <span class="tag">情绪识别</span>
+                        <span class="tag">实时渲染</span>
+                    </div>
+                </div>
+            </a>
+
+            <a href="FractalStudio/index.html" class="project-card fractal fade-in">
+                <div class="card-preview">
+                    <div class="preview-bg">∞</div>
+                </div>
+                <div class="card-content">
+                    <div class="card-header">
+                        <h2 class="card-title">分形绘制器</h2>
+                        <div class="card-arrow">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M5 12h14M12 5l7 7-7 7"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <p class="card-description">探索数学之美的无限可能，生成分形艺术作品，支持多种分形类型与配色方案。</p>
+                    <div class="card-tags">
+                        <span class="tag">分形艺术</span>
+                        <span class="tag">高清导出</span>
+                        <span class="tag">SVG支持</span>
+                    </div>
+                </div>
+            </a>
+
+            <a href="ColorChallenge/index.html" class="project-card color fade-in">
+                <div class="card-preview">
+                    <div class="preview-bg">🎨</div>
+                </div>
+                <div class="card-content">
+                    <div class="card-header">
+                        <h2 class="card-title">色差挑战</h2>
+                        <div class="card-arrow">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M5 12h14M12 5l7 7-7 7"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <p class="card-description">测试您的色彩敏感度，在渐进式挑战中提升色彩辨别能力，享受视听盛宴。</p>
+                    <div class="card-tags">
+                        <span class="tag">色彩游戏</span>
+                        <span class="tag">关卡挑战</span>
+                        <span class="tag">音效反馈</span>
+                    </div>
+                </div>
+            </a>
+
+            <a href="MirrorCanvas/index.html" class="project-card mirror fade-in">
+                <div class="card-preview">
+                    <div class="preview-bg">✦</div>
+                </div>
+                <div class="card-content">
+                    <div class="card-header">
+                        <h2 class="card-title">镜像画板</h2>
+                        <div class="card-arrow">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M5 12h14M12 5l7 7-7 7"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <p class="card-description">对称绘画创作工具，多种对称模式与趣味效果，轻松创作独特的对称艺术。</p>
+                    <div class="card-tags">
+                        <span class="tag">对称绘画</span>
+                        <span class="tag">趣味模式</span>
+                        <span class="tag">创意工具</span>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <footer>
+            <p class="footer-text">© 2024 KYJ Studio. All rights reserved.</p>
+            <div class="footer-links">
+                <a href="#" onclick="alert('使用说明即将推出'); return false;">使用说明</a>
+                <a href="#" onclick="alert('关于页面即将推出'); return false;">关于项目</a>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.project-card');
+            
+            cards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.zIndex = '10';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.zIndex = '1';
+                });
+            });
+
+            const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+            if (prefersReducedMotion.matches) {
+                document.querySelectorAll('.bg-orb').forEach(orb => {
+                    orb.style.animation = 'none';
+                });
+            }
+
+            document.querySelectorAll('a[href$="index.html"]').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    const href = this.getAttribute('href');
+                    if (href && !href.startsWith('http')) {
+                        e.preventDefault();
+                        
+                        this.style.transform = 'scale(0.98)';
+                        setTimeout(() => {
+                            this.style.transform = '';
+                            window.location.href = href;
+                        }, 150);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

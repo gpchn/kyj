@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FractalStudio | 分形绘制器</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Space+Grotesk:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: #0a0a0f;
+            color: #e0e0e0;
+            overflow: hidden;
+            min-height: 100vh;
+        }
+        
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+        
+        .sidebar {
+            width: 320px;
+            background: rgba(20, 20, 30, 0.95);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .logo {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 24px;
+            font-weight: 600;
+            color: #fff;
+            text-align: center;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .section {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 16px;
+        }
+        
+        .section-title {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-bottom: 12px;
+        }
+        
+        .fractal-types {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+        
+        .fractal-btn {
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: #e0e0e0;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .fractal-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .fractal-btn.active {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            border-color: transparent;
+            color: #fff;
+        }
+        
+        .param-group {
+            margin-bottom: 16px;
+        }
+        
+        .param-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+        
+        .param-value {
+            font-family: 'JetBrains Mono', monospace;
+            color: #8b5cf6;
+            font-size: 12px;
+        }
+        
+        .param-slider {
+            width: 100%;
+            height: 6px;
+            -webkit-appearance: none;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            outline: none;
+        }
+        
+        .param-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            background: #8b5cf6;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .param-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+        
+        .color-schemes {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+        
+        .color-scheme {
+            height: 32px;
+            border-radius: 6px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+        }
+        
+        .color-scheme:hover {
+            transform: scale(1.05);
+        }
+        
+        .color-scheme.active {
+            border-color: #fff;
+        }
+        
+        .julia-params {
+            display: none;
+        }
+        
+        .julia-params.visible {
+            display: block;
+        }
+        
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .action-btn {
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .action-btn.primary {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: #fff;
+        }
+        
+        .action-btn.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
+        }
+        
+        .action-btn.primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .action-btn.secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: #e0e0e0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .action-btn.secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .export-options {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .export-options .action-btn {
+            flex: 1;
+            padding: 12px;
+            font-size: 13px;
+        }
+        
+        .canvas-area {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(ellipse at center, #1a1a2e 0%, #0a0a0f 100%);
+            position: relative;
+        }
+        
+        #fractal-canvas {
+            border-radius: 8px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            cursor: grab;
+        }
+        
+        #fractal-canvas:active {
+            cursor: grabbing;
+        }
+        
+        .zoom-indicator {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(20, 20, 30, 0.9);
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .render-info {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(20, 20, 30, 0.9);
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .render-info div {
+            margin-bottom: 4px;
+        }
+        
+        .render-info div:last-child {
+            margin-bottom: 0;
+        }
+        
+        .progress-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #6366f1, #8b5cf6);
+            width: 0%;
+            transition: width 0.1s;
+        }
+        
+        .progress-bar.rendering {
+            animation: pulse 1s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .hint-badge {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(99, 102, 241, 0.2);
+            border: 1px solid rgba(99, 102, 241, 0.4);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            color: #a5b4fc;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .hint-badge.visible {
+            opacity: 1;
+        }
+        
+        .resolution-select {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        
+        .resolution-btn {
+            flex: 1;
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            color: #e0e0e0;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .resolution-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .resolution-btn.active {
+            background: rgba(139, 92, 246, 0.2);
+            border-color: #8b5cf6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div class="logo">FractalStudio</div>
+            
+            <div class="section">
+                <div class="section-title">分形类型</div>
+                <div class="fractal-types">
+                    <button class="fractal-btn active" data-type="mandelbrot">曼德博</button>
+                    <button class="fractal-btn" data-type="julia">朱利亚</button>
+                    <button class="fractal-btn" data-type="burningship">燃烧船</button>
+                    <button class="fractal-btn" data-type="tricorn">三角帽</button>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-title">参数调节</div>
+                
+                <div class="param-group">
+                    <div class="param-label">
+                        <span>最大迭代次数</span>
+                        <span class="param-value" id="iterations-value">256</span>
+                    </div>
+                    <input type="range" class="param-slider" id="iterations" min="50" max="1000" value="256">
+                </div>
+                
+                <div class="julia-params" id="julia-params">
+                    <div class="param-group">
+                        <div class="param-label">
+                            <span>Julia C (实部)</span>
+                            <span class="param-value" id="julia-real-value">-0.70</span>
+                        </div>
+                        <input type="range" class="param-slider" id="julia-real" min="-2" max="2" step="0.01" value="-0.70">
+                    </div>
+                    
+                    <div class="param-group">
+                        <div class="param-label">
+                            <span>Julia C (虚部)</span>
+                            <span class="param-value" id="julia-imag-value">0.27</span>
+                        </div>
+                        <input type="range" class="param-slider" id="julia-imag" min="-2" max="2" step="0.01" value="0.27">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-title">配色方案</div>
+                <div class="color-schemes" id="color-schemes">
+                    <div class="color-scheme active" data-scheme="cosmic" style="background: linear-gradient(135deg, #1a1a2e, #6366f1, #ec4899);"></div>
+                    <div class="color-scheme" data-scheme="fire" style="background: linear-gradient(135deg, #1a1a1a, #f97316, #fbbf24);"></div>
+                    <div class="color-scheme" data-scheme="ocean" style="background: linear-gradient(135deg, #0f172a, #06b6d4, #22d3ee);"></div>
+                    <div class="color-scheme" data-scheme="forest" style="background: linear-gradient(135deg, #0a1a0a, #22c55e, #86efac);"></div>
+                    <div class="color-scheme" data-scheme="grayscale" style="background: linear-gradient(135deg, #000, #666, #fff);"></div>
+                    <div class="color-scheme" data-scheme="rainbow" style="background: linear-gradient(135deg, #ef4444, #eab308, #22c55e, #3b82f6, #a855f7);"></div>
+                    <div class="color-scheme" data-scheme="neon" style="background: linear-gradient(135deg, #0a0a0a, #f0abfc, #22d3ee);"></div>
+                    <div class="color-scheme" data-scheme="sunset" style="background: linear-gradient(135deg, #1e1b4b, #f97316, #fbbf24);"></div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-title">操作</div>
+                <div class="action-buttons">
+                    <button class="action-btn primary" id="render-btn">渲染分形</button>
+                    <button class="action-btn secondary" id="reset-btn">重置视图</button>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-title">导出选项</div>
+                <div class="param-group">
+                    <div class="param-label">
+                        <span>导出分辨率</span>
+                    </div>
+                    <div class="resolution-select">
+                        <button class="resolution-btn" data-scale="1">1x</button>
+                        <button class="resolution-btn active" data-scale="2">2x</button>
+                        <button class="resolution-btn" data-scale="4">4x</button>
+                        <button class="resolution-btn" data-scale="8">8x</button>
+                    </div>
+                </div>
+                <div class="export-options">
+                    <button class="action-btn secondary" id="export-png-btn">导出 PNG</button>
+                    <button class="action-btn secondary" id="export-svg-btn">导出 SVG</button>
+                </div>
+            </div>
+            
+            <div class="section" style="font-size: 12px; color: rgba(255,255,255,0.5);">
+                <div class="section-title">操作提示</div>
+                <p>• 拖拽平移视图</p>
+                <p>• 点击"渲染分形"刷新</p>
+                <p>• 双击重置位置</p>
+                <p>• 调整参数后需手动渲染</p>
+            </div>
+        </div>
+        
+        <div class="canvas-area">
+            <canvas id="fractal-canvas" width="800" height="600"></canvas>
+            <div class="hint-badge" id="hint-badge">参数已更改，点击"渲染分形"刷新</div>
+            <div class="zoom-indicator">缩放: <span id="zoom-level">1.00x</span></div>
+            <div class="render-info">
+                <div>中心: (<span id="center-x">0.00</span>, <span id="center-y">0.00</span>)</div>
+                <div>渲染时间: <span id="render-time">0</span>ms</div>
+            </div>
+            <div class="progress-bar" id="progress-bar"></div>
+        </div>
+    </div>
+    
+    <script src="src/utils.js"></script>
+    <script src="src/fractalEngine.js"></script>
+    <script src="src/colorSchemes.js"></script>
+    <script src="src/main.js"></script>
+</body>
+</html>

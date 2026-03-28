@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>墨韵四季 | 专业水墨绘画</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Noto Serif SC', serif;
+            background: #1a1a1a;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        
+        .app-container {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+            padding: 20px;
+        }
+        
+        .toolbar {
+            width: 280px;
+            background: linear-gradient(180deg, #2a2a2a 0%, #1f1f1f 100%);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
+        
+        .toolbar-title {
+            font-family: 'Ma Shan Zheng', cursive;
+            font-size: 28px;
+            color: #f5f5f0;
+            text-align: center;
+            margin-bottom: 20px;
+            letter-spacing: 4px;
+        }
+        
+        .tool-section {
+            margin-bottom: 20px;
+        }
+        
+        .section-label {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+        }
+        
+        .season-selector {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+        
+        .season-btn {
+            padding: 12px 8px;
+            background: transparent;
+            border: 2px solid #444;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        
+        .season-btn .icon {
+            font-size: 24px;
+            margin-bottom: 4px;
+        }
+        
+        .season-btn .name {
+            font-size: 11px;
+            color: #888;
+        }
+        
+        .season-btn.spring { border-color: #ffb7c5; }
+        .season-btn.summer { border-color: #2d5a27; }
+        .season-btn.autumn { border-color: #c41e3a; }
+        .season-btn.winter { border-color: #a0a0a8; }
+        
+        .season-btn.active.spring { background: rgba(255, 183, 197, 0.2); }
+        .season-btn.active.summer { background: rgba(45, 90, 39, 0.2); }
+        .season-btn.active.autumn { background: rgba(196, 30, 58, 0.2); }
+        .season-btn.active.winter { background: rgba(160, 160, 168, 0.2); }
+        
+        .season-btn.active .name { color: #fff; }
+        
+        .brush-selector {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+        
+        .brush-btn {
+            padding: 15px 10px;
+            background: #333;
+            border: 2px solid #444;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        
+        .brush-btn:hover {
+            border-color: #666;
+        }
+        
+        .brush-btn.active {
+            border-color: #f5f5f0;
+            background: #444;
+        }
+        
+        .brush-btn .icon {
+            font-size: 20px;
+            color: #f5f5f0;
+        }
+        
+        .brush-btn .name {
+            font-size: 10px;
+            color: #888;
+            margin-top: 4px;
+        }
+        
+        .color-selector {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+        }
+        
+        .color-btn {
+            padding: 8px;
+            background: #333;
+            border: 2px solid #444;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        
+        .color-btn:hover {
+            border-color: #666;
+        }
+        
+        .color-btn.active {
+            border-color: #f5f5f0;
+            background: #444;
+        }
+        
+        .color-btn .color-preview {
+            width: 100%;
+            height: 24px;
+            border-radius: 4px;
+            margin-bottom: 4px;
+        }
+        
+        .color-btn .name {
+            font-size: 9px;
+            color: #888;
+        }
+        
+        .color-btn.active .name {
+            color: #fff;
+        }
+        
+        .slider-group {
+            margin-bottom: 15px;
+        }
+        
+        .slider-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        
+        .slider-label {
+            font-size: 11px;
+            color: #aaa;
+        }
+        
+        .slider-value {
+            font-size: 11px;
+            color: #666;
+        }
+        
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            -webkit-appearance: none;
+            background: #333;
+            border-radius: 3px;
+            outline: none;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            background: #f5f5f0;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .action-btn {
+            flex: 1;
+            padding: 12px;
+            background: #333;
+            border: 1px solid #444;
+            border-radius: 8px;
+            color: #f5f5f0;
+            font-family: 'Noto Serif SC', serif;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .action-btn:hover {
+            background: #444;
+        }
+        
+        .action-btn.primary {
+            background: #c41e3a;
+            border-color: #c41e3a;
+        }
+        
+        .action-btn.primary:hover {
+            background: #a01830;
+        }
+        
+        .canvas-container {
+            position: relative;
+            background: #0a0a0a;
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
+        
+        .canvas-frame {
+            position: relative;
+            border: 3px solid #333;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.3);
+        }
+        
+        #canvas {
+            display: block;
+            cursor: crosshair;
+        }
+        
+        .canvas-info {
+            position: absolute;
+            bottom: -30px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 11px;
+            color: #555;
+        }
+        
+        .color-preview {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: #333;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .color-swatch {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            border: 2px solid #444;
+        }
+        
+        .color-info {
+            flex: 1;
+        }
+        
+        .color-name {
+            font-size: 12px;
+            color: #f5f5f0;
+        }
+        
+        .color-hex {
+            font-size: 10px;
+            color: #666;
+        }
+        
+        .ink-level {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .ink-bar {
+            flex: 1;
+            height: 8px;
+            background: #333;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .ink-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #1a1a1a, #4a4a4a);
+            transition: width 0.3s;
+        }
+        
+        .ink-label {
+            font-size: 11px;
+            color: #888;
+            min-width: 30px;
+        }
+        
+        .bg-selector {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+        
+        .bg-btn {
+            padding: 10px;
+            background: #333;
+            border: 2px solid #444;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        
+        .bg-btn:hover {
+            border-color: #666;
+        }
+        
+        .bg-btn.active {
+            border-color: #f5f5f0;
+            background: #444;
+        }
+        
+        .bg-preview {
+            width: 100%;
+            height: 40px;
+            border-radius: 4px;
+            margin-bottom: 6px;
+        }
+        
+        .bg-btn .name {
+            font-size: 10px;
+            color: #888;
+        }
+        
+        .bg-btn.active .name {
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="toolbar">
+            <h1 class="toolbar-title">墨韵四季</h1>
+            
+            <div class="tool-section">
+                <div class="section-label">季节主题</div>
+                <div class="season-selector">
+                    <button class="season-btn spring active" data-season="spring">
+                        <div class="icon">🌸</div>
+                        <div class="name">春</div>
+                    </button>
+                    <button class="season-btn summer" data-season="summer">
+                        <div class="icon">🌿</div>
+                        <div class="name">夏</div>
+                    </button>
+                    <button class="season-btn autumn" data-season="autumn">
+                        <div class="icon">🍁</div>
+                        <div class="name">秋</div>
+                    </button>
+                    <button class="season-btn winter" data-season="winter">
+                        <div class="icon">❄️</div>
+                        <div class="name">冬</div>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="tool-section">
+                <div class="section-label">画笔类型</div>
+                <div class="brush-selector" id="brush-selector">
+                    <button class="brush-btn active" data-brush="ink">
+                        <div class="icon">✒️</div>
+                        <div class="name">水墨</div>
+                    </button>
+                    <button class="brush-btn" data-brush="splash">
+                        <div class="icon">💧</div>
+                        <div class="name">晕染</div>
+                    </button>
+                    <button class="brush-btn" data-brush="flower">
+                        <div class="icon">🌸</div>
+                        <div class="name">花卉</div>
+                    </button>
+                    <button class="brush-btn" data-brush="leaf">
+                        <div class="icon">🍃</div>
+                        <div class="name">叶片</div>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="tool-section">
+                <div class="section-label">基础颜色</div>
+                <div class="color-selector" id="color-selector">
+                    <button class="color-btn active" data-color="ink" title="使用墨色">
+                        <div class="color-preview" style="background: linear-gradient(135deg, #1a1a1a, #5a5a5a);"></div>
+                        <div class="name">墨色</div>
+                    </button>
+                    <button class="color-btn" data-color="#8b4513" title="赭石">
+                        <div class="color-preview" style="background: #8b4513;"></div>
+                        <div class="name">赭石</div>
+                    </button>
+                    <button class="color-btn" data-color="#c41e3a" title="朱砂">
+                        <div class="color-preview" style="background: #c41e3a;"></div>
+                        <div class="name">朱砂</div>
+                    </button>
+                    <button class="color-btn" data-color="#2d5a27" title="花青">
+                        <div class="color-preview" style="background: #2d5a27;"></div>
+                        <div class="name">花青</div>
+                    </button>
+                    <button class="color-btn" data-color="#d4a574" title="藤黄">
+                        <div class="color-preview" style="background: #d4a574;"></div>
+                        <div class="name">藤黄</div>
+                    </button>
+                    <button class="color-btn" data-color="#1e3d1a" title="石青">
+                        <div class="color-preview" style="background: #1e3d1a;"></div>
+                        <div class="name">石青</div>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="tool-section">
+                <div class="color-preview">
+                    <div class="color-swatch" id="color-swatch"></div>
+                    <div class="color-info">
+                        <div class="color-name" id="color-name">淡墨</div>
+                        <div class="color-hex" id="color-hex">#4a4a4a</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tool-section">
+                <div class="slider-group">
+                    <div class="slider-header">
+                        <span class="slider-label">笔触大小</span>
+                        <span class="slider-value" id="size-value">20px</span>
+                    </div>
+                    <input type="range" id="brush-size" min="5" max="80" value="20">
+                </div>
+                
+                <div class="slider-group">
+                    <div class="slider-header">
+                        <span class="slider-label">墨色浓度</span>
+                        <span class="slider-value" id="density-value">70%</span>
+                    </div>
+                    <input type="range" id="ink-density" min="10" max="100" value="70">
+                </div>
+                
+                <div class="slider-group">
+                    <div class="slider-header">
+                        <span class="slider-label">水分含量</span>
+                        <span class="slider-value" id="wetness-value">50%</span>
+                    </div>
+                    <input type="range" id="wetness" min="0" max="100" value="50">
+                </div>
+            </div>
+            
+            <div class="tool-section">
+                <div class="section-label">宣纸背景</div>
+                <div class="bg-selector">
+                    <button class="bg-btn active" data-bg="1">
+                        <div class="bg-preview" style="background: linear-gradient(135deg, #f5f0e6, #e8e0d0);"></div>
+                        <div class="name">宣纸一</div>
+                    </button>
+                    <button class="bg-btn" data-bg="2">
+                        <div class="bg-preview" style="background: linear-gradient(135deg, #f0ebe0, #ddd5c5);"></div>
+                        <div class="name">宣纸二</div>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="tool-section">
+                <div class="section-label">墨量</div>
+                <div class="ink-level">
+                    <div class="ink-bar">
+                        <div class="ink-fill" id="ink-fill" style="width: 100%"></div>
+                    </div>
+                    <span class="ink-label">100%</span>
+                </div>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="action-btn" id="clear-btn">清空画布</button>
+                <button class="action-btn primary" id="save-btn">保存作品</button>
+            </div>
+        </div>
+        
+        <div class="canvas-container">
+            <div class="canvas-frame">
+                <canvas id="canvas" width="900" height="700"></canvas>
+            </div>
+            <div class="canvas-info">宣纸尺寸: 900 × 700 像素</div>
+        </div>
+    </div>
+    
+    <script src="src/utils.js"></script>
+    <script src="src/brushEngine.js"></script>
+    <script src="src/seasonThemes.js"></script>
+    <script src="src/canvasRenderer.js"></script>
+    <script src="src/main.js"></script>
+</body>
+</html>

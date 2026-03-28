@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>情绪光谱 | Emotion Spectrum</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Space+Grotesk:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: #0a0a0f;
+            overflow: hidden;
+            min-height: 100vh;
+        }
+        
+        #canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+        }
+        
+        .title-container {
+            position: fixed;
+            top: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            z-index: 100;
+        }
+        
+        .title {
+            font-family: 'Playfair Display', serif;
+            font-size: 48px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.95);
+            letter-spacing: 8px;
+            text-shadow: 0 0 60px rgba(255, 255, 255, 0.3);
+            margin-bottom: 12px;
+        }
+        
+        .subtitle {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.4);
+            letter-spacing: 4px;
+            font-weight: 300;
+        }
+        
+        .emotion-display {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 100;
+            pointer-events: none;
+        }
+        
+        .emotion-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 72px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.9);
+            text-shadow: 0 0 100px currentColor;
+            transition: all 0.5s ease;
+            opacity: 0;
+        }
+        
+        .emotion-name.visible {
+            opacity: 1;
+        }
+        
+        .emotion-intensity {
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 20px;
+            letter-spacing: 2px;
+        }
+        
+        .controls {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            z-index: 100;
+        }
+        
+        .mode-selector {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .mode-btn {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            color: rgba(255, 255, 255, 0.6);
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 12px;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .mode-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+        
+        .mode-btn.active {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.4);
+            color: rgba(255, 255, 255, 0.95);
+        }
+        
+        .visualizer-stats {
+            position: fixed;
+            top: 40px;
+            right: 40px;
+            text-align: right;
+            z-index: 100;
+        }
+        
+        .stat-item {
+            margin-bottom: 15px;
+        }
+        
+        .stat-label {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.3);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 500;
+        }
+        
+        .frequency-bars {
+            display: flex;
+            gap: 3px;
+            justify-content: flex-end;
+            margin-top: 5px;
+        }
+        
+        .freq-bar {
+            width: 4px;
+            background: linear-gradient(to top, rgba(255, 107, 157, 0.8), rgba(78, 205, 196, 0.8));
+            border-radius: 2px;
+            transition: height 0.1s ease;
+        }
+        
+        .status {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.3);
+            letter-spacing: 2px;
+            z-index: 100;
+        }
+        
+        .corner-decoration {
+            position: fixed;
+            width: 100px;
+            height: 100px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            z-index: 100;
+            pointer-events: none;
+        }
+        
+        .corner-decoration.top-left {
+            top: 20px;
+            left: 20px;
+            border-right: none;
+            border-bottom: none;
+        }
+        
+        .corner-decoration.top-right {
+            top: 20px;
+            right: 20px;
+            border-left: none;
+            border-bottom: none;
+        }
+        
+        .corner-decoration.bottom-left {
+            bottom: 20px;
+            left: 20px;
+            border-right: none;
+            border-top: none;
+        }
+        
+        .corner-decoration.bottom-right {
+            bottom: 20px;
+            right: 20px;
+            border-left: none;
+            border-top: none;
+        }
+        
+        .permission-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 10, 15, 0.95);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            transition: opacity 0.3s ease;
+        }
+        
+        .permission-content {
+            text-align: center;
+            max-width: 400px;
+            padding: 40px;
+        }
+        
+        .permission-icon {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 30px;
+            fill: rgba(255, 255, 255, 0.6);
+        }
+        
+        .permission-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 32px;
+            color: rgba(255, 255, 255, 0.95);
+            margin-bottom: 16px;
+        }
+        
+        .permission-text {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.5);
+            line-height: 1.8;
+            margin-bottom: 30px;
+        }
+        
+        .start-btn {
+            padding: 16px 48px;
+            background: linear-gradient(135deg, rgba(255, 107, 157, 0.3) 0%, rgba(78, 205, 196, 0.3) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 30px;
+            color: rgba(255, 255, 255, 0.9);
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 16px;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .start-btn:hover {
+            background: linear-gradient(135deg, rgba(255, 107, 157, 0.4) 0%, rgba(78, 205, 196, 0.4) 100%);
+            border-color: rgba(255, 255, 255, 0.4);
+            transform: translateY(-2px);
+        }
+        
+        .start-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .calibration-controls {
+            margin-top: 15px;
+        }
+        
+        .gain-slider {
+            width: 100px;
+            height: 4px;
+            -webkit-appearance: none;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
+            outline: none;
+            margin-top: 8px;
+        }
+        
+        .gain-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 14px;
+            height: 14px;
+            background: linear-gradient(135deg, #ff6b9d, #4ecdc4);
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        
+        .gain-value {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: 4px;
+        }
+        
+        .calibrate-btn {
+            padding: 8px 16px;
+            background: rgba(78, 205, 196, 0.2);
+            border: 1px solid rgba(78, 205, 196, 0.4);
+            border-radius: 15px;
+            color: rgba(255, 255, 255, 0.8);
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-right: 8px;
+        }
+        
+        .calibrate-btn:hover {
+            background: rgba(78, 205, 196, 0.3);
+            border-color: rgba(78, 205, 196, 0.6);
+        }
+        
+        .calibrate-btn.secondary {
+            background: rgba(255, 107, 157, 0.2);
+            border-color: rgba(255, 107, 157, 0.4);
+        }
+        
+        .calibrate-btn.secondary:hover {
+            background: rgba(255, 107, 157, 0.3);
+            border-color: rgba(255, 107, 157, 0.6);
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    
+    <div class="corner-decoration top-left"></div>
+    <div class="corner-decoration top-right"></div>
+    <div class="corner-decoration bottom-left"></div>
+    <div class="corner-decoration bottom-right"></div>
+    
+    <div class="title-container">
+        <h1 class="title">情绪光谱</h1>
+        <p class="subtitle">VOICE · EMOTION · VISUAL</p>
+    </div>
+    
+    <div class="emotion-display">
+        <div class="emotion-name" id="emotion-name"></div>
+        <div class="emotion-intensity" id="emotion-intensity"></div>
+    </div>
+    
+    <div class="visualizer-stats">
+        <div class="stat-item">
+            <div class="stat-label">音量</div>
+            <div class="stat-value" id="volume-value">0 dB</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-label">频率</div>
+            <div class="stat-value" id="freq-value">0 Hz</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-label">频谱</div>
+            <div class="frequency-bars" id="freq-bars"></div>
+        </div>
+        <div class="stat-item calibration-controls">
+            <div class="stat-label">增益</div>
+            <input type="range" class="gain-slider" id="gain-slider" min="1" max="10" step="0.5" value="3">
+            <div class="gain-value" id="gain-value">3x</div>
+        </div>
+        <div class="stat-item">
+            <button class="calibrate-btn" id="calibrate-btn">校准静音</button>
+            <button class="calibrate-btn secondary" id="reset-calibrate-btn">重置</button>
+        </div>
+    </div>
+    
+    <p class="status" id="status">等待启动</p>
+    
+    <div class="controls">
+        <div class="mode-selector">
+            <button class="mode-btn active" data-mode="wave">波纹</button>
+            <button class="mode-btn" data-mode="particle">粒子</button>
+            <button class="mode-btn" data-mode="spiral">螺旋</button>
+            <button class="mode-btn" data-mode="kaleidoscope">万花筒</button>
+        </div>
+    </div>
+    
+    <div class="permission-overlay" id="permission-overlay">
+        <div class="permission-content">
+            <svg class="permission-icon" viewBox="0 0 24 24">
+                <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm-1-9c0-.55.45-1 1-1s1 .45 1 1v6c0 .55-.45 1-1 1s-1-.45-1-1V5zm6 6c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+            </svg>
+            <h2 class="permission-title">开启声音之旅</h2>
+            <p class="permission-text">
+                情绪光谱需要访问您的麦克风来分析声音并生成独特的视觉艺术效果。您的声音数据仅在本地处理，不会上传到任何服务器。
+            </p>
+            <button class="start-btn" id="start-btn">开始体验</button>
+        </div>
+    </div>
+    
+    <script src="src/utils.js"></script>
+    <script src="src/audioAnalyzer.js"></script>
+    <script src="src/emotionEngine.js"></script>
+    <script src="src/visualizers/waveVisualizer.js"></script>
+    <script src="src/visualizers/particleVisualizer.js"></script>
+    <script src="src/visualizers/spiralVisualizer.js"></script>
+    <script src="src/visualizers/kaleidoscopeVisualizer.js"></script>
+    <script src="src/main.js"></script>
+</body>
+</html>
