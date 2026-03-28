@@ -337,6 +337,175 @@
             background: rgba(255, 107, 157, 0.3);
             border-color: rgba(255, 107, 157, 0.6);
         }
+
+        @media (max-width: 768px) {
+            .title {
+                font-size: 28px;
+                letter-spacing: 4px;
+            }
+            
+            .subtitle {
+                font-size: 11px;
+                letter-spacing: 2px;
+            }
+            
+            .title-container {
+                top: 20px;
+            }
+            
+            .emotion-name {
+                font-size: 42px;
+            }
+            
+            .emotion-intensity {
+                font-size: 14px;
+                margin-top: 12px;
+            }
+            
+            .visualizer-stats {
+                top: auto;
+                bottom: 140px;
+                right: 15px;
+                left: 15px;
+                text-align: center;
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 15px;
+            }
+            
+            .stat-item {
+                margin-bottom: 0;
+            }
+            
+            .stat-value {
+                font-size: 18px;
+            }
+            
+            .controls {
+                bottom: 20px;
+                width: calc(100% - 30px);
+                padding: 0 15px;
+            }
+            
+            .mode-selector {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 8px;
+            }
+            
+            .mode-btn {
+                padding: 12px 16px;
+                font-size: 13px;
+                min-width: 70px;
+            }
+            
+            .status {
+                bottom: 80px;
+                font-size: 11px;
+            }
+            
+            .corner-decoration {
+                width: 50px;
+                height: 50px;
+            }
+            
+            .permission-content {
+                padding: 20px;
+            }
+            
+            .permission-title {
+                font-size: 24px;
+            }
+            
+            .permission-text {
+                font-size: 13px;
+                margin-bottom: 20px;
+            }
+            
+            .permission-icon {
+                width: 60px;
+                height: 60px;
+                margin-bottom: 20px;
+            }
+            
+            .start-btn {
+                padding: 14px 36px;
+                font-size: 15px;
+            }
+            
+            .calibration-controls {
+                display: none;
+            }
+            
+            .calibrate-btn {
+                padding: 10px 14px;
+                font-size: 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .title {
+                font-size: 22px;
+                letter-spacing: 3px;
+            }
+            
+            .emotion-name {
+                font-size: 32px;
+            }
+            
+            .mode-btn {
+                padding: 10px 12px;
+                font-size: 12px;
+                min-width: 60px;
+            }
+            
+            .visualizer-stats {
+                bottom: 120px;
+                gap: 10px;
+            }
+            
+            .stat-label {
+                font-size: 9px;
+            }
+            
+            .stat-value {
+                font-size: 16px;
+            }
+        }
+
+        @media (max-height: 600px) {
+            .title-container {
+                top: 15px;
+            }
+            
+            .title {
+                font-size: 24px;
+                margin-bottom: 6px;
+            }
+            
+            .controls {
+                bottom: 15px;
+            }
+            
+            .visualizer-stats {
+                bottom: 100px;
+            }
+        }
+
+        @media (hover: none) and (pointer: coarse) {
+            .mode-btn {
+                min-height: 44px;
+            }
+            
+            .start-btn {
+                min-height: 48px;
+            }
+            
+            .calibrate-btn {
+                min-height: 40px;
+            }
+        }
     </style>
 </head>
 <body>

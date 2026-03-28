@@ -371,9 +371,309 @@
         .bg-btn.active .name {
             color: #fff;
         }
+
+        .mobile-toggle {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #c41e3a, #a01830);
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 20px rgba(196, 30, 58, 0.5);
+        }
+
+        .mobile-toggle svg {
+            width: 24px;
+            height: 24px;
+            fill: #fff;
+        }
+
+        .toolbar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 998;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .toolbar-overlay.visible {
+            opacity: 1;
+        }
+
+        @media (max-width: 1024px) {
+            .app-container {
+                flex-direction: column;
+                padding: 10px;
+                gap: 15px;
+            }
+
+            .toolbar {
+                width: 100%;
+                max-width: 100%;
+                padding: 15px;
+            }
+
+            .toolbar-title {
+                font-size: 22px;
+                margin-bottom: 15px;
+            }
+
+            .tool-section {
+                margin-bottom: 15px;
+            }
+
+            .canvas-container {
+                order: -1;
+            }
+
+            #canvas {
+                max-width: 100%;
+                height: auto;
+            }
+
+            .canvas-info {
+                position: relative;
+                bottom: auto;
+                margin-top: 10px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                min-height: 100dvh;
+            }
+
+            .mobile-toggle {
+                display: flex;
+            }
+
+            .toolbar-overlay {
+                display: block;
+            }
+
+            .app-container {
+                padding: 5px;
+                gap: 10px;
+            }
+
+            .toolbar {
+                position: fixed;
+                bottom: -100%;
+                left: 0;
+                right: 0;
+                width: 100%;
+                max-width: 100%;
+                max-height: 70vh;
+                overflow-y: auto;
+                border-radius: 20px 20px 0 0;
+                z-index: 999;
+                transition: bottom 0.3s ease;
+                padding: 20px;
+                padding-bottom: 30px;
+            }
+
+            .toolbar.open {
+                bottom: 0;
+            }
+
+            .canvas-container {
+                width: 100%;
+                padding: 8px;
+                border-radius: 8px;
+            }
+
+            .canvas-frame {
+                border-width: 2px;
+            }
+
+            #canvas {
+                width: 100%;
+                max-width: 100%;
+                height: auto;
+            }
+
+            .season-selector {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 6px;
+            }
+
+            .season-btn {
+                padding: 10px 6px;
+            }
+
+            .season-btn .icon {
+                font-size: 20px;
+            }
+
+            .season-btn .name {
+                font-size: 10px;
+            }
+
+            .brush-selector {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 6px;
+            }
+
+            .brush-btn {
+                padding: 12px 8px;
+            }
+
+            .brush-btn .icon {
+                font-size: 18px;
+            }
+
+            .color-selector {
+                grid-template-columns: repeat(6, 1fr);
+                gap: 6px;
+            }
+
+            .color-btn {
+                padding: 6px;
+            }
+
+            .color-btn .color-preview {
+                height: 20px;
+            }
+
+            .color-preview {
+                padding: 8px;
+            }
+
+            .color-swatch {
+                width: 32px;
+                height: 32px;
+            }
+
+            .slider-group {
+                margin-bottom: 12px;
+            }
+
+            input[type="range"] {
+                height: 8px;
+            }
+
+            input[type="range"]::-webkit-slider-thumb {
+                width: 20px;
+                height: 20px;
+            }
+
+            .bg-selector {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .action-buttons {
+                margin-top: 15px;
+            }
+
+            .action-btn {
+                padding: 14px;
+                font-size: 14px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .toolbar {
+                max-height: 80vh;
+                padding: 15px;
+                padding-bottom: 25px;
+            }
+
+            .toolbar-title {
+                font-size: 20px;
+            }
+
+            .section-label {
+                font-size: 11px;
+            }
+
+            .season-btn .icon {
+                font-size: 18px;
+            }
+
+            .brush-btn .icon {
+                font-size: 16px;
+            }
+
+            .brush-btn .name,
+            .color-btn .name {
+                font-size: 9px;
+            }
+
+            .slider-label,
+            .slider-value {
+                font-size: 10px;
+            }
+
+            .canvas-container {
+                padding: 5px;
+            }
+
+            .mobile-toggle {
+                width: 56px;
+                height: 56px;
+                bottom: 15px;
+                right: 15px;
+            }
+        }
+
+        @media (max-height: 600px) {
+            .toolbar {
+                max-height: 75vh;
+            }
+
+            .tool-section {
+                margin-bottom: 10px;
+            }
+
+            .toolbar-title {
+                margin-bottom: 10px;
+            }
+        }
+
+        @media (hover: none) and (pointer: coarse) {
+            .season-btn,
+            .brush-btn,
+            .color-btn,
+            .bg-btn,
+            .action-btn {
+                min-height: 44px;
+            }
+
+            input[type="range"]::-webkit-slider-thumb {
+                width: 24px;
+                height: 24px;
+            }
+
+            .mobile-toggle {
+                min-width: 48px;
+                min-height: 48px;
+            }
+
+            #canvas {
+                touch-action: none;
+            }
+        }
     </style>
 </head>
 <body>
+    <button class="mobile-toggle" id="mobile-toggle" aria-label="打开工具栏">
+        <svg viewBox="0 0 24 24">
+            <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+        </svg>
+    </button>
+    <div class="toolbar-overlay" id="toolbar-overlay"></div>
     <div class="app-container">
         <div class="toolbar">
             <h1 class="toolbar-title">墨韵四季</h1>
@@ -526,6 +826,51 @@
         </div>
     </div>
     
+    <script>
+        (function() {
+            var mobileToggle = document.getElementById('mobile-toggle');
+            var toolbar = document.querySelector('.toolbar');
+            var overlay = document.getElementById('toolbar-overlay');
+            
+            if (mobileToggle && toolbar && overlay) {
+                mobileToggle.addEventListener('click', function() {
+                    toolbar.classList.toggle('open');
+                    overlay.classList.toggle('visible');
+                });
+                
+                overlay.addEventListener('click', function() {
+                    toolbar.classList.remove('open');
+                    overlay.classList.remove('visible');
+                });
+            }
+            
+            function resizeCanvas() {
+                var canvas = document.getElementById('canvas');
+                if (canvas && window.innerWidth <= 1024) {
+                    var container = canvas.closest('.canvas-container');
+                    var maxWidth = container.clientWidth - 16;
+                    var aspectRatio = 900 / 700;
+                    
+                    var width = Math.min(maxWidth, 900);
+                    var height = width / aspectRatio;
+                    
+                    canvas.style.width = width + 'px';
+                    canvas.style.height = height + 'px';
+                }
+            }
+            
+            window.addEventListener('resize', resizeCanvas);
+            window.addEventListener('orientationchange', function() {
+                setTimeout(resizeCanvas, 100);
+            });
+            
+            if (document.readyState === 'complete') {
+                resizeCanvas();
+            } else {
+                window.addEventListener('load', resizeCanvas);
+            }
+        })();
+    </script>
     <script src="src/utils.js"></script>
     <script src="src/brushEngine.js"></script>
     <script src="src/seasonThemes.js"></script>

@@ -297,9 +297,267 @@
             transform: translate(-50%, -50%);
             z-index: 100;
         }
+
+        .mobile-toggle {
+            display: none;
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            z-index: 1000;
+            width: 44px;
+            height: 44px;
+            background: #1a1a1a;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .mobile-toggle svg {
+            width: 24px;
+            height: 24px;
+            fill: #fff;
+        }
+
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 998;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .sidebar-overlay.visible {
+            opacity: 1;
+        }
+
+        @media (max-width: 768px) {
+            .mobile-toggle {
+                display: flex;
+            }
+
+            .sidebar-overlay {
+                display: block;
+            }
+
+            body {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                position: fixed;
+                left: -100%;
+                top: 0;
+                width: 85%;
+                max-width: 300px;
+                height: 100%;
+                z-index: 999;
+                transition: left 0.3s ease;
+                overflow-y: auto;
+                padding-top: 20px;
+            }
+
+            .sidebar.open {
+                left: 0;
+            }
+
+            .canvas-area {
+                width: 100%;
+                height: 100vh;
+            }
+
+            #canvas {
+                max-width: calc(100vw - 20px);
+                max-height: calc(100vh - 20px);
+            }
+
+            .logo {
+                font-size: 18px;
+                padding-bottom: 15px;
+            }
+
+            .section {
+                gap: 10px;
+            }
+
+            .symmetry-modes {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 6px;
+            }
+
+            .mode-btn {
+                padding: 10px 6px;
+                font-size: 11px;
+            }
+
+            .mode-icon {
+                width: 28px;
+                height: 28px;
+            }
+
+            .mode-icon svg {
+                width: 20px;
+                height: 20px;
+            }
+
+            .fun-modes {
+                gap: 6px;
+            }
+
+            .fun-btn {
+                padding: 8px 6px;
+                font-size: 10px;
+            }
+
+            .fun-icon {
+                font-size: 16px;
+            }
+
+            .param-slider {
+                height: 6px;
+            }
+
+            .param-slider::-webkit-slider-thumb {
+                width: 18px;
+                height: 18px;
+            }
+
+            .color-palette {
+                gap: 6px;
+            }
+
+            .color-btn {
+                width: 28px;
+                height: 28px;
+            }
+
+            .custom-color {
+                width: 28px;
+                height: 28px;
+            }
+
+            .action-buttons {
+                gap: 6px;
+            }
+
+            .action-btn {
+                padding: 10px;
+                font-size: 13px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .sidebar {
+                width: 90%;
+                padding: 15px;
+            }
+
+            .logo {
+                font-size: 16px;
+            }
+
+            .section-title {
+                font-size: 10px;
+            }
+
+            .mode-btn {
+                padding: 8px 4px;
+                font-size: 10px;
+            }
+
+            .mode-icon {
+                width: 24px;
+                height: 24px;
+            }
+
+            .mode-icon svg {
+                width: 18px;
+                height: 18px;
+            }
+
+            .param-label {
+                font-size: 12px;
+            }
+
+            .param-slider::-webkit-slider-thumb {
+                width: 20px;
+                height: 20px;
+            }
+
+            .color-btn,
+            .custom-color {
+                width: 26px;
+                height: 26px;
+            }
+
+            #canvas {
+                max-width: calc(100vw - 10px);
+                max-height: calc(100vh - 10px);
+            }
+        }
+
+        @media (max-height: 600px) {
+            .sidebar {
+                padding: 15px;
+            }
+
+            .logo {
+                font-size: 16px;
+                padding-bottom: 10px;
+            }
+
+            .section {
+                gap: 8px;
+            }
+
+            .action-buttons {
+                margin-top: auto;
+            }
+        }
+
+        @media (hover: none) and (pointer: coarse) {
+            .mode-btn,
+            .fun-btn,
+            .action-btn {
+                min-height: 44px;
+            }
+
+            .color-btn,
+            .custom-color {
+                min-width: 44px;
+                min-height: 44px;
+            }
+
+            .param-slider::-webkit-slider-thumb {
+                width: 24px;
+                height: 24px;
+            }
+
+            .mobile-toggle {
+                min-width: 48px;
+                min-height: 48px;
+            }
+
+            #canvas {
+                touch-action: none;
+            }
+        }
     </style>
 </head>
 <body>
+    <button class="mobile-toggle" id="mobile-toggle" aria-label="打开菜单">
+        <svg viewBox="0 0 24 24">
+            <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+        </svg>
+    </button>
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
     <div class="sidebar">
         <div class="logo">镜像画板</div>
         
@@ -417,6 +675,51 @@
         <div class="brush-preview" id="brush-preview"></div>
     </div>
     
+    <script>
+        (function() {
+            var mobileToggle = document.getElementById('mobile-toggle');
+            var sidebar = document.querySelector('.sidebar');
+            var overlay = document.getElementById('sidebar-overlay');
+            
+            if (mobileToggle && sidebar && overlay) {
+                mobileToggle.addEventListener('click', function() {
+                    sidebar.classList.toggle('open');
+                    overlay.classList.toggle('visible');
+                });
+                
+                overlay.addEventListener('click', function() {
+                    sidebar.classList.remove('open');
+                    overlay.classList.remove('visible');
+                });
+            }
+            
+            function resizeCanvas() {
+                var canvas = document.getElementById('canvas');
+                if (canvas && window.innerWidth <= 768) {
+                    var maxWidth = Math.min(window.innerWidth - 20, 800);
+                    var maxHeight = Math.min(window.innerHeight - 20, 600);
+                    var aspectRatio = 800 / 600;
+                    
+                    var width = maxWidth;
+                    var height = width / aspectRatio;
+                    
+                    if (height > maxHeight) {
+                        height = maxHeight;
+                        width = height * aspectRatio;
+                    }
+                    
+                    canvas.style.width = width + 'px';
+                    canvas.style.height = height + 'px';
+                }
+            }
+            
+            window.addEventListener('resize', resizeCanvas);
+            window.addEventListener('orientationchange', function() {
+                setTimeout(resizeCanvas, 100);
+            });
+            resizeCanvas();
+        })();
+    </script>
     <script src="src/app.js"></script>
 </body>
 </html>

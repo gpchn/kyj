@@ -386,6 +386,60 @@
                 margin-bottom: 10px;
             }
         }
+
+        @media (hover: none) and (pointer: coarse) {
+            .color-block {
+                min-width: 50px;
+                min-height: 50px;
+            }
+
+            .btn {
+                min-height: 48px;
+            }
+
+            .heart {
+                min-width: 24px;
+                min-height: 24px;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .game-container {
+                padding: 10px;
+            }
+
+            .title {
+                font-size: 28px;
+            }
+
+            .stats-bar {
+                gap: 12px;
+            }
+
+            .stat-value {
+                font-size: 20px;
+            }
+
+            .game-board {
+                padding: 12px;
+                gap: 5px;
+            }
+
+            .color-block {
+                min-width: 35px;
+                min-height: 35px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .color-block,
+            .message,
+            .difficulty-fill,
+            .heart {
+                transition: none;
+                animation: none;
+            }
+        }
     </style>
 </head>
 <body>

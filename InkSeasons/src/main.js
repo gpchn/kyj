@@ -11,23 +11,30 @@ class App {
         this.updateUI();
     }
     
+    getCanvasCoords(e) {
+        const canvas = this.canvasRenderer.canvas;
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        return {
+            x: (e.clientX - rect.left) * scaleX,
+            y: (e.clientY - rect.top) * scaleY
+        };
+    }
+    
     bindEvents() {
         const canvas = this.canvasRenderer.canvas;
         
         canvas.addEventListener('mousedown', (e) => {
-            const rect = canvas.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            this.brushEngine.startStroke(x, y);
+            const coords = this.getCanvasCoords(e);
+            this.brushEngine.startStroke(coords.x, coords.y);
         });
         
         canvas.addEventListener('mousemove', (e) => {
             if (!this.brushEngine.isDrawing) return;
             
-            const rect = canvas.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            this.brushEngine.continueStroke(x, y);
+            const coords = this.getCanvasCoords(e);
+            this.brushEngine.continueStroke(coords.x, coords.y);
             this.updateInkLevel();
         });
         
@@ -42,10 +49,8 @@ class App {
         canvas.addEventListener('touchstart', (e) => {
             e.preventDefault();
             const touch = e.touches[0];
-            const rect = canvas.getBoundingClientRect();
-            const x = touch.clientX - rect.left;
-            const y = touch.clientY - rect.top;
-            this.brushEngine.startStroke(x, y);
+            const coords = this.getCanvasCoords(touch);
+            this.brushEngine.startStroke(coords.x, coords.y);
         });
         
         canvas.addEventListener('touchmove', (e) => {
@@ -53,10 +58,8 @@ class App {
             if (!this.brushEngine.isDrawing) return;
             
             const touch = e.touches[0];
-            const rect = canvas.getBoundingClientRect();
-            const x = touch.clientX - rect.left;
-            const y = touch.clientY - rect.top;
-            this.brushEngine.continueStroke(x, y);
+            const coords = this.getCanvasCoords(touch);
+            this.brushEngine.continueStroke(coords.x, coords.y);
             this.updateInkLevel();
         });
         
